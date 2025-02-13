@@ -1,0 +1,46 @@
+{% extends 'app.html' %}
+{% block content %}
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="row">
+        <div class="col-5 mx-auto">
+
+            <br><br><br>
+            <h3>BOOK</h3>
+            <form method='post' action='{{url_for("book")}}'>
+               
+                <div class="form-group">
+                    <label for="">VEHICLE.NO</label>
+                    <input type='text' name='bvehicleno' required class='form-control'>
+                </div>
+                <!--<div class="form-group">
+                    <label for="">DATE</label>
+                    <input type='date' name='bdate' required class='form-control'>
+                </div>-->
+                <div class="form-group">
+                    <label for="">TIME</label>
+                    <input type='time' name='bfromtime' required class='form-control'>
+                </div>
+                <div class="form-group">
+                    <label for="">TO</label>
+                    <input type='time' name='btotime' required class='form-control'>
+                </div>
+                <input type="submit" value="BOOK" class="btn btn-primary">
+            </form>
+            <br>
+
+        </div>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,185 @@
+
+{% extends 'app.html' %}
+{% block content %}
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    {% endwith %}
+    <br><br>
+
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Book a Parking Slot</h1>
+    <form action="/advbook" method="post">
+        <input type="hidden" name="areaid" value="{{ areaid }}">  <!-- Store the areaid -->
+     
+        <div class="form-group">
+            <label for="vehicle_number">Vehicle Number:</label>
+            <input type="text" class="form-control" id="vehicle_number" name="vehicle_no" required>
+        </div>
+
+        <div class="form-group">
+            <label for="vehicle_type">Vehicle Type:</label>
+            <input type="radio" class="radio" id="two_wheeler" name="vehicle_type" value="2" required>2 Wheeler
+            
+            <input type="radio" class="radio" id="four_wheeler" name="vehicle_type" value="4">4 Wheeler
+        </div>
+        
+        <div class="form-group">
+            <label for="date_from">Date From (DD-MM-YYYY):</label>
+            <input type="date" class="form-control" id="date_from" name="date_from" value="{{ current_date }}" min="{{ current_date }}" readonly required>
+        </div>
+        
+        <div class="form-group">
+            <label for="time_from">Time From (HH:MM):</label>
+            <input type="time" class="form-control" id="time_from" name="time_from" value="{{ current_time }}" min="{{ current_time }}"readonly required>
+        </div>
+        
+        <div class="form-group">
+            <label for="date_to">Date To (DD-MM-YYYY):</label>
+            <input type="date" class="form-control" id="date_to" name="date_to" value="{{ current_date }}" min="{{ current_date }}" readonly required>
+        
+        </div>
+        
+        <div class="form-group">
+            <label for="time_to">Time To (HH:MM):</label>
+            <input type="time" class="form-control" id="time_to" name="time_to" required>
+        </div>
+        <div class="form-group">
+            <h5>Estimated Price: <span id="total_price">₹0.00</span></h5>
+        </div>
+        <button id="rzp-button" class="btn btn-primary btn-block">Proceed to Payment</button>
+        <!--
+        <button type="submit" class="btn btn-primary btn-block">Book Slot</button> -->
+    </form>
+</div>
+<br><br>
+
+<!-- Bootstrap JS, Popper.js, and jQuery (required for some Bootstrap components) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    
+    
+    
+
+    function calculatePrice() {
+        const dateFrom = document.getElementById('date_from').value;
+        const timeFrom = document.getElementById('time_from').value;
+        const dateTo = document.getElementById('date_to').value;
+        const timeTo = document.getElementById('time_to').value;
+
+        let basePay = 0.953; // Base pay rate per minute
+    if (document.getElementById('two_wheeler').checked) {
+        basePay = 0.633; // Base pay for 2 Wheeler
+    }
+
+
+        if (dateFrom && timeFrom && dateTo && timeTo) {
+            // Combine date and time to create Date objects
+            const startDateTime = new Date(`${dateFrom}T${timeFrom}`);
+            const endDateTime = new Date(`${dateTo}T${timeTo}`);
+
+            // Ensure valid date range
+            if (startDateTime < endDateTime) {
+                const durationInMinutes = (endDateTime - startDateTime) / (1000 * 60);
+                const totalPrice = Math.round((durationInMinutes * basePay)).toFixed(2);
+                
+
+                // Update the price in the designated <span>
+                document.getElementById('total_price').innerText = `₹${totalPrice}`;
+            } else {
+                document.getElementById('total_price').innerText = 'Invalid date range';
+            }
+        }
+    }
+
+    // Attach event listeners to the input fields
+    document.getElementById('date_from').addEventListener('change', calculatePrice);
+    document.getElementById('time_from').addEventListener('change', calculatePrice);
+    document.getElementById('date_to').addEventListener('change', calculatePrice);
+    document.getElementById('time_to').addEventListener('change', calculatePrice);
+    document.getElementById('two_wheeler').addEventListener('change', calculatePrice);
+    document.getElementById('four_wheeler').addEventListener('change', calculatePrice);</script>
+
+
+</script>
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.getElementById('rzp-button').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const vehicleNumber = document.getElementById('vehicle_number').value;
+        const vehicleType = document.querySelector('input[name="vehicle_type"]:checked').value;
+        const dateFrom = document.getElementById('date_from').value;
+        const timeFrom = document.getElementById('time_from').value;
+        const dateTo = document.getElementById('date_to').value;
+        const timeTo = document.getElementById('time_to').value;
+
+        fetch('/advbook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                vehicle_no: vehicleNumber,
+                vehicle_type: vehicleType,
+                date_from: dateFrom,
+                time_from: timeFrom,
+                date_to: dateTo,
+                time_to: timeTo,
+                areaid: "{{ areaid }}"
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            var options = {
+                "key": "rzp_test_cIeCwAX1qqUKB5",
+                "amount": data.amount * 100,
+                "currency": "INR",
+                "name": "Parking Slot Booking",
+                "order_id": data.order_id,
+                "handler": function (response) {
+                    fetch('/verify_payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_signature: response.razorpay_signature,
+                            booking_details: data.booking_details
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        alert(result.message);
+                        if (result.success) {
+                            window.location.href = "/tsummary";
+                        }
+                    });
+                },
+                "theme": { "color": "#3399cc" }
+            };
+
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        });
+    });
+</script>
+
+
+
+{% endblock %}

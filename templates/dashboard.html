@@ -1,0 +1,55 @@
+{% extends 'app.html' %}
+{% block content %}
+<br><br><br>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}" role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+    
+    
+
+    <h2>Your Booking Details</h2>
+    <table class="table">
+        <tr>
+            <th class="table-dark">Booking ID</th>
+            <th class="table-dark">Vehicle No</th>
+            <th class="table-dark">vehicle_type</th>
+            <th class="table-dark">From Date Time</th>
+            <th class="table-dark">To Date Time</th>
+            <th class="table-dark">Slot No</th>
+            <th class="table-dark">parking area</th>
+            <th class="table-dark">Amount_paid</th>
+
+            
+
+            
+
+        </tr>
+        {% for booking in bookings %}
+        <tr>
+            <td class="table-primary">#PARKSYNC5432{{ booking[0] }}</td>
+            <td class="table-primary">{{ booking[1] }}</td>
+            <td class="table-primary">{{ booking[2] }}</td>
+            <td class="table-primary">{{ booking[3] }}</td>
+            <td class="table-primary">{{ booking[4] }}</td>
+            <td class="table-primary">{{ booking[5] }}</td>
+            <td class="table-primary">{{ booking[6] }}</td>
+            <td class="table-primary">{{ booking[7] }}</td>
+
+            
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5">No bookings found</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    
+{% endblock %}
+

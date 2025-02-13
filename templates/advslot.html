@@ -1,0 +1,57 @@
+{% extends 'app.html' %}
+{% block content %}
+<br><br><br>
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Parking Availability</h2>
+
+  <!-- Search Bar -->
+  <input type="text" id="searchBar" class="form-control mb-3" placeholder="Search for parking..." onkeyup="filterParking()">
+
+  <div class="row" id="parkingContainer">
+
+    {% for parking in parking_data %}
+    <div class="col-md-4 parking-item">
+      <div class="card border-dark mb-3" style="max-width: 18rem;">
+        <div class="card-header">PARKING</div>
+        <div class="card-body text-dark">
+          <h5 class="card-title">{{ parking[1] }}</h5> <!-- area_name -->
+          <div id="space-count-{{ parking[0] }}">{{ parking[2] }}</div> <!-- Available slot count -->
+          <p class="card-text">Currently Available slot</p>
+          <div class="btn-group" role="group" aria-label="Basic example">
+            <button type="button" class="btn btn-primary" 
+                    {% if parking[2] == 0 %} disabled {% endif %}
+                    onclick="redirectToBookingPage({{ parking[0] }})">
+              BOOK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+
+<script>
+  function redirectToBookingPage(areaId) {
+    // Redirect to the booking page with the area ID
+    window.location.href = '/advslotform/' + areaId;
+  }
+
+  function filterParking() {
+    let input = document.getElementById('searchBar').value.toLowerCase();
+    let items = document.getElementsByClassName('parking-item');
+
+    for (let i = 0; i < items.length; i++) {
+      let title = items[i].getElementsByClassName('card-title')[0].innerText.toLowerCase();
+      if (title.includes(input)) {
+        items[i].style.display = "block";
+      } else {
+        items[i].style.display = "none";
+      }
+    }
+  }
+</script>
+
+{% endblock %}

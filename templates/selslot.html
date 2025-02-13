@@ -1,0 +1,71 @@
+{% extends 'app.html' %}
+{% block content %}
+<br><br><br>
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">Parking Availability</h2>
+  
+  <!-- Search Bar -->
+  <input type="text" id="searchBar" class="form-control mb-3" placeholder="Search for parking..." onkeyup="filterParking()">
+
+  
+
+
+  <div class="row" id="parkingContainer">
+    {% for parking in parking_data %}
+      <div class="col-md-4 parking-item">
+        <div class="card border-dark mb-3" style="max-width: 18rem;">
+          <div class="card-header">Parking</div>
+          <div class="card-body text-dark">
+            <h5 class="card-title parking-name">{{ parking.area_name }}</h5>
+            <h5 class="card-title" id="parking-{{ parking.id }}">{{ parking.available_count }}</h5>
+            <p class="card-text">Available slots</p>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-primary" 
+              {% if parking.available_count == 0 %} disabled {% endif %}
+              onclick="redirectToBookingPage({{ parking.id }})">
+        BOOK
+      </button>            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function fetchUpdatedParkingData() {
+    fetch('/get_parking_data')  // Fetch updated slot data
+      .then(response => response.json())
+      .then(data => {
+        data.forEach(parking => {
+          let parkingSlot = document.getElementById(`parking-${parking.id}`);
+          if (parkingSlot) {
+            parkingSlot.innerText = parking.available_count;
+          }
+        });
+      })
+      .catch(error => console.error('Error fetching parking data:', error));
+  }
+
+  // Auto-refresh only the availability count every 5 seconds
+  setInterval(fetchUpdatedParkingData, 5000);
+
+  function redirectToBookingPage(areaId) {
+    window.location.href = '/instslotform/' + areaId;
+  }
+
+  function filterParking() {
+    let input = document.getElementById('searchBar').value.toLowerCase();
+    let items = document.getElementsByClassName('parking-item');
+
+    for (let i = 0; i < items.length; i++) {
+      let title = items[i].getElementsByClassName('parking-name')[0].innerText.toLowerCase();
+      if (title.includes(input)) {
+        items[i].style.display = "block";
+      } else {
+        items[i].style.display = "none";
+      }
+    }
+  }
+</script>
+{% endblock %}

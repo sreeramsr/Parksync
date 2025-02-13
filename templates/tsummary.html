@@ -1,0 +1,102 @@
+{% extends 'app.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Booking Summary</h1>
+    
+    <!-- Card to display booking details -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Booking Details</h5>
+        </div>
+        <div class="position-relative m-4">
+            <div class="progress" role="progressbar" aria-label="Progress" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="height: 1px;">
+              <div class="progress-bar" style="width: 100%"></div>
+            </div>
+            <button type="button" class="position-absolute top-0 start-0 translate-middle btn btn-sm btn-primary rounded-pill" style="width: 2rem; height:2rem;">1</button>
+            <button type="button" class="position-absolute top-0 start-50 translate-middle btn btn-sm btn-primary rounded-pill" style="width: 2rem; height:2rem;">2</button>
+            <button type="button" class="position-absolute top-0 start-100 translate-middle btn btn-sm btn-success rounded-pill" style="width: 2rem; height:2rem;">3</button>
+          </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th>Booking ID</th>
+                        <td>#parksync432{{ booking_details.booking_id }}</td>
+                    </tr>
+                    <tr>
+                        <th>Vehicle No</th>
+                        <td>{{ booking_details.vehicle_no }}</td>
+                    </tr>
+                    <tr>
+                        <th>Vehicle Type</th>
+                        <td>{{ booking_details.vehicle_type }}</td>
+                    </tr>
+                    <tr>
+                        <th>From Date & Time</th>
+                        <td>{{ booking_details.date_from }}</td>
+                    </tr>
+                    <tr>
+                        <th>To Date & Time</th>
+                        <td>{{ booking_details.date_to }}</td>
+                    </tr>
+                    <tr>
+                        <th>Slot No</th>
+                        <td>{{ booking_details.slot_no }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <!-- Hidden input field to store the areaid -->
+            <input type="hidden" id="areaid" value="{{ booking_details.areaid }}">
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <button class="btn btn-success" onclick="navigateToSlot()">Navigate To Spot</button>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{{ url_for('internalnav') }}" class="btn btn-danger">Navigate To lot</a>
+    </div>
+    <br>
+</div>
+
+<script>
+    function navigateToSlot() {
+        const areaId = document.getElementById("areaid").value; // Get areaid
+
+        if (!areaId) {
+            alert("Invalid Area ID!");
+            return;
+        }
+
+        // Get user's location
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const userLat = position.coords.latitude;
+                const userLon = position.coords.longitude;
+
+                // Fetch slot location from server using areaid
+                fetch(`/get_slot_location/${areaId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert("Slot location not found!");
+                        } else {
+                            const destinationLat = data.lat;
+                            const destinationLon = data.lon;
+                            const mapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLon}&destination=${destinationLat},${destinationLon}&travelmode=driving`;
+                            window.location.href = mapsUrl;
+                        }
+                    })
+                    .catch(error => {
+                        alert("Error fetching location data!");
+                    });
+            }, function(error) {
+                alert("Geolocation failed!");
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+</script>
+{% endblock %}

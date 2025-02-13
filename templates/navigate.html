@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Navigator</title>
+        </head>
+        <body>
+            <h1>Navigate to Parking Slot</h1>
+            <label for="slot_id">Enter Slot ID:</label>
+            <input type="number" id="slot_id">
+            <button onclick="navigate()">Navigate</button>
+            <div id="result"></div>
+            <script>
+                function navigate() {
+                    const slot_id = document.getElementById("slot_id").value;
+                    if (!slot_id) {
+                        alert("Please enter a valid Slot ID");
+                        return;
+                    }
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(function(position) {
+                            const userLocation = {
+                                lat: position.coords.latitude,
+                                lon: position.coords.longitude,
+                                id: slot_id
+                            };
+                            fetch('/navigate', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify(userLocation)
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.error) {
+                                    document.getElementById('result').innerHTML = data.error;
+                                } else {
+                                    window.location.href = data.directions_url;
+                                }
+                            })
+                            .catch(error => console.error('Error:', error));
+                        }, function() {
+                            alert("Geolocation failed");
+                        });
+                    } else {
+                        alert("Geolocation is not supported by this browser.");
+                    }
+                }
+            </script>
+        </body>
+        </html>

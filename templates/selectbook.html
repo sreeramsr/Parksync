@@ -1,0 +1,27 @@
+{% extends 'app.html' %}
+{% block content %}
+
+<div class="container mt-4">
+    <center><br><br><br>
+        <h2>Book Spot</h2>
+        <div class="mt-4">
+            <!-- Instant Booking Button -->
+            <a href="{{ url_for('parking_availability') }}" class="btn btn-primary btn-lg me-2">Instant Booking</a><br><br>
+            
+            <!-- Advanced Booking Button (No URL defined yet) -->
+            <a href="{{ url_for('advslot') }}" class="btn btn-primary btn-lg me-2">Advanced Booking</a>
+        </div>
+        <br><br><h2>Navigate Me to Recent Booking</h2>
+        <div class="mt-4">
+            <!-- Instant Booking Button -->
+            <a href="{{ url_for('tsummary') }}" class="btn btn-success btn-lg me-2"> Navigate To Spot</a>
+            
+           
+            
+        </div>
+    </center>
+
+</div>
+<br><br>
+
+{% endblock %}
