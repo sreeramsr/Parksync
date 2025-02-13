@@ -1,3 +1,63 @@
+# Parksync
+
+Parksync is an intelligent parking management system designed to streamline and optimize indoor parking. This project was developed as part of the Mint Hackathon at IIT-M.
+
+## Features
+- Real-time user location tracking
+- Indoor navigation similar to Google Maps
+- Route guidance to specific locations 
+- Interactive search bar for filtering and displaying parking slots
+- Integration with Razorpay for seamless payment processing
+
+## Tech Stack
+### Frontend:
+- HTML
+- CSS
+- Bootstrap
+
+### Backend:
+- Python (Flask framework)
+- MySQL (XAMPP server)
+- OpenCV, Pandas, NumPy, and YOLO for AI/ML processing
+
+
+## Installation & Setup
+### Prerequisites:
+- Python 3.x
+- Flask
+- MySQL (XAMPP Server)
+
+
+### Steps:
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/sreeramsr/Parksync.git
+   cd Parksync
+   ```
+2. **Setup MySQL Database:**
+   - Start XAMPP and launch MySQL
+   - Create a database named `carparking`
+   
+3. **Install dependencies:**
+   ```sh
+   pip install -r requirements.txt
+   ```
+4. **Run the Flask backend:**
+   ```sh
+   python app.py
+   ```
+5. **Run the Node.js backend (if applicable):**
+   ```sh
+   node server.js
+   ```
+6. **Access the application:**
+   - Open `http://localhost:5000` in your browser
+
+
+
+
+
+
 ![Screenshot 2025-02-13 144946](https://github.com/user-attachments/assets/28027b41-1f61-4312-bc87-3e75e3581ec3)
 ![Screenshot 2025-02-13 144957](https://github.com/user-attachments/assets/31a14a71-4998-4d47-be86-22da56cccd63)
 ![Screenshot 2025-02-13 145004](https://github.com/user-attachments/assets/ef94026d-f3b4-4749-9d8a-d78435720cfb)
